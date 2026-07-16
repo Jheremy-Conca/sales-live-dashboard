@@ -12,7 +12,7 @@ defineProps({
         <li v-for="sale in sales" :key="sale.id">
           <span class="product">{{ sale.product }}</span>
           <span class="region">{{ sale.region }}</span>
-          <span class="amount">${{ sale.amount }}</span>
+          <span class="amount">${{ Number(sale.amount).toFixed(2) }}</span>
         </li>
       </transition-group>
     </div>

@@ -10,7 +10,7 @@ defineProps({
   <div class="stats-cards">
     <div class="card stat-card">
       <span class="label">Total del día</span>
-      <span class="value">${{ totalVentasDia.toFixed(2) }}</span>
+      <span class="value">${{ Number(totalVentasDia).toFixed(2) }}</span>
     </div>
     <div class="card stat-card">
       <span class="label">N° de ventas</span>
@@ -18,7 +18,7 @@ defineProps({
     </div>
     <div class="card stat-card">
       <span class="label">Ticket promedio</span>
-      <span class="value">${{ ticketPromedio.toFixed(2) }}</span>
+      <span class="value">${{ Number(ticketPromedio).toFixed(2) }}</span>
     </div>
   </div>
 </template>

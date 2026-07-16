@@ -35,9 +35,11 @@ export const useSalesStore = defineStore('sales', {
       if (this.recentSales.length > 15) this.recentSales.pop();
 
       // Stats generales
-      this.totalVentasDia = stats.totalVentasDia;
-      this.contadorVentas = stats.contadorVentas;
-      this.ticketPromedio = stats.ticketPromedio;
+      // Number(...) por si acaso: si `amount` es Decimal en Prisma, puede
+      // llegar como string al serializarse por el socket.
+      this.totalVentasDia = Number(stats.totalVentasDia);
+      this.contadorVentas = Number(stats.contadorVentas);
+      this.ticketPromedio = Number(stats.ticketPromedio);
 
       // Top productos
       if (!this.salesByProduct[sale.product]) {
@@ -49,11 +51,13 @@ export const useSalesStore = defineStore('sales', {
       if (!this.salesByRegion[sale.region]) {
         this.salesByRegion[sale.region] = 0;
       }
-      this.salesByRegion[sale.region] += sale.amount;
+      this.salesByRegion[sale.region] += Number(sale.amount);
 
       // Historial para el gráfico de línea (máx 20 puntos)
+      // sale.createdAt (no sale.timestamp: ese campo ya no existe desde
+      // que las ventas se persisten con Prisma, ver salesEmitter.js).
       this.chartHistory.push({
-        time: new Date(sale.timestamp).toLocaleTimeString(),
+        time: new Date(sale.createdAt).toLocaleTimeString(),
         total: this.totalVentasDia,
       });
       if (this.chartHistory.length > 20) this.chartHistory.shift();
