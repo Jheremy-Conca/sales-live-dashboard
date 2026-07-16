@@ -18,7 +18,24 @@ sales-live-dashboard/
 │   │   └── socket/salesEmitter.js
 │   ├── .env.example
 │   └── package.json
-└── frontend/         # Cliente que consume la API y el socket
+└── frontend/         # Vue 3 + Pinia + Chart.js (vue-chartjs)
+    ├── src/
+    │   ├── App.vue              # única vista, arma todo el layout
+    │   ├── main.js               # registro central de Chart.js + Pinia
+    │   ├── components/
+    │   │   ├── StatsCards.vue
+    │   │   ├── RecentOrders.vue
+    │   │   ├── LiveChart.vue
+    │   │   ├── TopProducts.vue
+    │   │   └── SalesByRegion.vue
+    │   ├── composables/
+    │   │   └── useChartTheme.js  # paleta y opciones de Chart.js compartidas
+    │   ├── services/
+    │   │   └── socket.js         # cliente de socket.io
+    │   └── stores/
+    │       └── salesStore.js     # Pinia: estado global de ventas en vivo
+    ├── netlify.toml
+    └── package.json
 ```
 
 ## Backend
@@ -71,7 +88,31 @@ socket.on('new-sale', ({ sale, stats }) => {
 
 ## Frontend
 
-Ver `frontend/README.md` (o completar según el stack usado).
+Vue 3 + Pinia + Chart.js (`vue-chartjs`). Sin vue-router: `App.vue` es la única vista y arma todo el layout directamente.
+
+### Setup local
+
+```bash
+cd frontend
+npm install
+echo "VITE_API_URL=http://localhost:4000" > .env
+npm run dev
+```
+
+### Cómo fluyen los datos
+
+1. `main.js` registra los componentes de Chart.js una sola vez (evita registros duplicados por componente) y monta Pinia.
+2. `App.vue` llama a `store.initSocket()` en `onMounted`, que conecta `services/socket.js` y escucha el evento `new-sale`.
+3. `stores/salesStore.js` centraliza todo el estado: feed de últimas ventas, stats del día, ventas por producto/región e historial para el gráfico de línea.
+4. Cada componente (`StatsCards`, `RecentOrders`, `LiveChart`, `TopProducts`, `SalesByRegion`) recibe su parte del estado por props, sin tocar el store directamente.
+
+### Deploy (Netlify)
+
+1. **Base directory**: `frontend`
+2. **Build command**: `npm run build`
+3. **Publish directory**: `dist`
+4. Variable de entorno: `VITE_API_URL` = URL del backend en Render.
+5. Después del primer deploy, actualiza `CLIENT_URL` en Render con la URL final de Netlify (o el CORS bloquea el socket).
 
 ## Variables de entorno
 
